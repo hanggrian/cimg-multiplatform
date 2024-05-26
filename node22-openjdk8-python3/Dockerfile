@@ -1,19 +1,17 @@
 # A combination of:
 #
-# - https://github.com/CircleCI-Public/cimg-node/blob/main/22.2/Dockerfile
-# - https://github.com/CircleCI-Public/cimg-openjdk/blob/main/8.0/Dockerfile
-# - https://github.com/CircleCI-Public/cimg-python/blob/main/3.12/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-node/raw/main/22.2/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/8.0/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.12/Dockerfile
 
 FROM cimg/base:2024.02
 
 LABEL maintainer="Hendra Anggrian <hendraanggrian@gmail.com>"
 
-# Node
-
 ENV NODE_VERSION 22.2.0
 
 RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="arm64" && \
-  curl -L -o node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" && \
+   curl -L -o node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" && \
   sudo tar -xJf node.tar.xz -C /usr/local --strip-components=1 && \
   rm node.tar.xz && \
   sudo ln -s /usr/local/bin/node /usr/local/bin/nodejs
@@ -29,8 +27,6 @@ RUN curl -L -o yarn.tar.gz "https://yarnpkg.com/downloads/${YARN_VERSION}/yarn-v
 
 # Install an alternative, but growing in popularity Node.js package manager
 RUN sudo npm install -g pnpm
-
-# OpenJDK
 
 ENV JAVA_VERSION 8.0.402
 ENV JAVA_HOME /usr/local/jdk-${JAVA_VERSION}
@@ -97,8 +93,6 @@ RUN dl_URL="https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${S
   mill_URL="https://github.com/com-lihaoyi/mill/releases/download/${MILL_VERSION}/${MILL_VERSION}" && \
   curl -sSL --fail --retry 3 $mill_URL > mill && \
   sudo mv mill /usr/local/bin/mill && chmod +x /usr/local/bin/mill
-
-# Python
 
 ENV PYENV_ROOT=/home/circleci/.pyenv \
   PATH=/home/circleci/.pyenv/shims:/home/circleci/.pyenv/bin:/home/circleci/.poetry/bin:$PATH \
