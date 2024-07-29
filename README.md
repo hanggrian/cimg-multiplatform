@@ -1,4 +1,4 @@
-[![Docker Hub](https://img.shields.io/docker/v/hendraanggrian/cimg-multiplatform)](https://hub.docker.com/r/hendraanggrian/cimg-multiplatform/)
+[![Docker Hub](https://img.shields.io/docker/v/hanggrian/cimg-multiplatform)](https://hub.docker.com/r/hanggrian/cimg-multiplatform/)
 
 # CircleCI Multiplatform Images
 

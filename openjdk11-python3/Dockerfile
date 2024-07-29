@@ -1,13 +1,13 @@
 # A combination of:
 #
-# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/8.0/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/11.0/Dockerfile
 # - https://github.com/CircleCI-Public/cimg-python/raw/main/3.12/Dockerfile
 
 FROM cimg/base:2024.02
 
 LABEL maintainer="Hendra Anggrian <hanggrian@proton.me>"
 
-ENV JAVA_VERSION 8.0.402
+ENV JAVA_VERSION 11.0.22
 ENV JAVA_HOME /usr/local/jdk-${JAVA_VERSION}
 
 RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
@@ -27,7 +27,7 @@ RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
   sudo tar -xzf java.tar.gz --strip-components=1 -C /usr/local/jdk-${JAVA_VERSION} && \
   rm java.tar.gz && \
   if [[ "$JAVA_VERSION" == *"0.0"* ]]; then \
-    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-8; \
+    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-11; \
   fi && \
   sudo ln -s /usr/local/jdk-${JAVA_VERSION}/bin/* /usr/bin/ && \
   sudo mkdir -p /etc/ssl/certs/java/cacerts && \

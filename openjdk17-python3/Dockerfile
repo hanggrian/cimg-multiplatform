@@ -1,13 +1,13 @@
 # A combination of:
 #
-# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/8.0/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/17.0/Dockerfile
 # - https://github.com/CircleCI-Public/cimg-python/raw/main/3.12/Dockerfile
 
 FROM cimg/base:2024.02
 
 LABEL maintainer="Hendra Anggrian <hanggrian@proton.me>"
 
-ENV JAVA_VERSION 8.0.402
+ENV JAVA_VERSION 17.0.11
 ENV JAVA_HOME /usr/local/jdk-${JAVA_VERSION}
 
 RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
@@ -27,7 +27,7 @@ RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
   sudo tar -xzf java.tar.gz --strip-components=1 -C /usr/local/jdk-${JAVA_VERSION} && \
   rm java.tar.gz && \
   if [[ "$JAVA_VERSION" == *"0.0"* ]]; then \
-    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-8; \
+    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-17; \
   fi && \
   sudo ln -s /usr/local/jdk-${JAVA_VERSION}/bin/* /usr/bin/ && \
   sudo mkdir -p /etc/ssl/certs/java/cacerts && \
@@ -50,7 +50,7 @@ RUN dl_URL="https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apa
   sudo ln -s /opt/apache-maven-* /opt/apache-maven && \
   mvn --version
 
-ENV GRADLE_VERSION=8.5 \
+ENV GRADLE_VERSION=8.7 \
   PATH=/opt/gradle/bin:$PATH
 RUN dl_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" && \
   curl -sSL --fail --retry 3 $dl_URL -o gradle.zip && \
@@ -59,9 +59,9 @@ RUN dl_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-b
   sudo ln -s /opt/gradle-* /opt/gradle && \
   gradle --version
 
-ENV SBT_VERSION=1.9.8 \
+ENV SBT_VERSION=1.9.9 \
   PATH=/opt/sbt/bin:$PATH
-ENV MILL_VERSION=0.11.2
+ENV MILL_VERSION=0.11.7
 RUN dl_URL="https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz" && \
   curl -sSL --fail --retry 3 $dl_URL -o sbt.tar.gz && \
   sudo tar -xzf sbt.tar.gz -C /opt/ && \

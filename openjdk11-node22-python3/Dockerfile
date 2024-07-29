@@ -1,13 +1,14 @@
 # A combination of:
 #
-# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/8.0/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/11.0/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-node/raw/main/22.5/Dockerfile
 # - https://github.com/CircleCI-Public/cimg-python/raw/main/3.12/Dockerfile
 
 FROM cimg/base:2024.02
 
 LABEL maintainer="Hendra Anggrian <hanggrian@proton.me>"
 
-ENV JAVA_VERSION 8.0.402
+ENV JAVA_VERSION 11.0.22
 ENV JAVA_HOME /usr/local/jdk-${JAVA_VERSION}
 
 RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
@@ -27,7 +28,7 @@ RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
   sudo tar -xzf java.tar.gz --strip-components=1 -C /usr/local/jdk-${JAVA_VERSION} && \
   rm java.tar.gz && \
   if [[ "$JAVA_VERSION" == *"0.0"* ]]; then \
-    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-8; \
+    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-11; \
   fi && \
   sudo ln -s /usr/local/jdk-${JAVA_VERSION}/bin/* /usr/bin/ && \
   sudo mkdir -p /etc/ssl/certs/java/cacerts && \
@@ -72,6 +73,26 @@ RUN dl_URL="https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${S
   mill_URL="https://github.com/com-lihaoyi/mill/releases/download/${MILL_VERSION}/${MILL_VERSION}" && \
   curl -sSL --fail --retry 3 $mill_URL > mill && \
   sudo mv mill /usr/local/bin/mill && chmod +x /usr/local/bin/mill
+
+ENV NODE_VERSION 22.5.1
+
+RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="arm64" && \
+   curl -L -o node.tar.xz "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${ARCH}.tar.xz" && \
+  sudo tar -xJf node.tar.xz -C /usr/local --strip-components=1 && \
+  rm node.tar.xz && \
+  sudo ln -s /usr/local/bin/node /usr/local/bin/nodejs
+
+ENV PATH /home/circleci/.yarn/bin:$PATH
+
+ENV YARN_VERSION 1.22.22
+RUN curl -L -o yarn.tar.gz "https://yarnpkg.com/downloads/${YARN_VERSION}/yarn-v${YARN_VERSION}.tar.gz" && \
+  sudo tar -xzf yarn.tar.gz -C /opt/ && \
+  rm yarn.tar.gz && \
+  sudo ln -s /opt/yarn-v${YARN_VERSION}/bin/yarn /usr/local/bin/yarn && \
+  sudo ln -s /opt/yarn-v${YARN_VERSION}/bin/yarnpkg /usr/local/bin/yarnpkg
+
+# Install an alternative, but growing in popularity Node.js package manager
+RUN sudo npm install -g pnpm
 
 ENV PYENV_ROOT=/home/circleci/.pyenv \
   PATH=/home/circleci/.pyenv/shims:/home/circleci/.pyenv/bin:/home/circleci/.poetry/bin:$PATH \

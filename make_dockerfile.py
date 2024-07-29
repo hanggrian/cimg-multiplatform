@@ -1,22 +1,24 @@
 """
-Write Dockerfile to root with command 'python make_dockerfile.py platform1:version1 ...'
+Write Dockerfile to root with command 'python make_dockerfile.py platform1-version1 ...'
 """
 
+from os import mkdir
 from sys import argv
 
 from requests import get
 
 BASE_VERSION = "2024.02"
 MAINTAINER_NAME = 'Hendra Anggrian'
-MAINTAINER_EMAIL = 'hendraanggrian@gmail.com'
+MAINTAINER_EMAIL = 'hanggrian@proton.me'
 
 
-def get_dockerfile_content(
+def get_content(
     platform,
     version,
     branch='main',
     start_from='LABEL maintainer="CircleCI Execution Team <eng-execution@circleci.com>"\n',
 ):
+    """Retrieve content from GitHub raw file."""
     url = \
         'https://github.com/CircleCI-Public/' + \
         f'cimg-{platform}/' + \
@@ -28,6 +30,7 @@ def get_dockerfile_content(
 
 
 if __name__ == '__main__':
+    dir_name = ''
     lines = \
         f'''
 FROM cimg/base:{BASE_VERSION}
@@ -43,9 +46,12 @@ LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
         arr = arg.split('-')
         if len(arr) != 2:
             raise ValueError()
-        content = get_dockerfile_content(arr[0], arr[1])
-        lines += content[1]
-        comment_lines += f'# - {content[0]}\n'
+        dir_name += f'{arr[0]}{arr[1].split('.')[0]}-'
+        path, content = get_content(arr[0], arr[1])
+        lines += content
+        comment_lines += f'# - {path}\n'
 
-    with open('Dockerfile', 'w', encoding='UTF-8') as file:
+    dir_name = dir_name[:-1]
+    mkdir(dir_name)
+    with open(f'{dir_name}/Dockerfile', 'w', encoding='UTF-8') as file:
         file.write(comment_lines + lines)
