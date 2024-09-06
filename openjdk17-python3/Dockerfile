@@ -1,11 +1,8 @@
-# A combination of:
-#
-# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/17.0/Dockerfile
-# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.12/Dockerfile
-
 FROM cimg/base:2024.02
 
 LABEL maintainer="Hendra Anggrian <hanggrian@proton.me>"
+
+# https://github.com/CircleCI-Public/cimg-openjdk/raw/main/17.0/Dockerfile
 
 ENV JAVA_VERSION 17.0.11
 ENV JAVA_HOME /usr/local/jdk-${JAVA_VERSION}
@@ -73,10 +70,12 @@ RUN dl_URL="https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${S
   curl -sSL --fail --retry 3 $mill_URL > mill && \
   sudo mv mill /usr/local/bin/mill && chmod +x /usr/local/bin/mill
 
+# https://github.com/CircleCI-Public/cimg-python/raw/main/3.12/Dockerfile
+
 ENV PYENV_ROOT=/home/circleci/.pyenv \
   PATH=/home/circleci/.pyenv/shims:/home/circleci/.pyenv/bin:/home/circleci/.poetry/bin:$PATH \
-  PYTHON_VERSION=3.12.4 \
-  PIPENV_DEFAULT_PYTHON_VERSION=3.12.4
+  PYTHON_VERSION=3.12.5 \
+  PIPENV_DEFAULT_PYTHON_VERSION=3.12.5
 
 RUN sudo apt-get update && sudo apt-get install -y \
     build-essential \
@@ -103,7 +102,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
   curl -sSL "https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer" | bash && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.12.4 && pyenv global 3.12.4
+RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.12.5 && pyenv global 3.12.5
 
 RUN python --version && \
   pip --version && \

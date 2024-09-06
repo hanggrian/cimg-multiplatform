@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 set -eo pipefail
-sudo docker build -t hanggrian/cimg-multiplatform:node22-python3 node22-python3
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk8-node22 openjdk8-node22
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk8-python3 openjdk8-python3
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk8-node22-python3 openjdk8-node22-python3
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk11-node22 openjdk11-node22
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk11-python3 openjdk11-python3
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk11-node22-python3 openjdk11-node22-python3
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk17-node22 openjdk17-node22
+
+sudo docker build -t hanggrian/cimg-multiplatform:android2024-python3 android2024-python3
+sudo docker build -t hanggrian/cimg-multiplatform:android2024-python3-browsers android2024-python3-browsers
+sudo docker build -t hanggrian/cimg-multiplatform:android2024-python3-node android2024-python3-node
 sudo docker build -t hanggrian/cimg-multiplatform:openjdk17-python3 openjdk17-python3
-sudo docker build -t hanggrian/cimg-multiplatform:openjdk17-node22-python3 openjdk17-node22-python3
+sudo docker build -t hanggrian/cimg-multiplatform:openjdk17-python3-browsers openjdk17-python3-browsers
+sudo docker build -t hanggrian/cimg-multiplatform:openjdk17-python3-node openjdk17-python3-node
+sudo docker build -t hanggrian/cimg-multiplatform:openjdk21-python3 openjdk21-python3
+sudo docker build -t hanggrian/cimg-multiplatform:openjdk21-python3-browsers openjdk21-python3-browsers
+sudo docker build -t hanggrian/cimg-multiplatform:openjdk21-python3-node openjdk21-python3-node
