@@ -2,5 +2,11 @@
 .DS_Store
 ._*
 
-# VSCode
-bin/
+# PyCharm
+*.iml
+.idea/
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+**/.coverage
