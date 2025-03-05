@@ -1,35 +1,53 @@
 # pylint: disable=missing-module-docstring
 
 from os import makedirs
+from textwrap import dedent
 
 from requests import get, Response
 
 BASE_VERSION: str = '2024.02'
 MAINTAINER_NAME: str = 'Hendra Anggrian'
 MAINTAINER_EMAIL: str = 'hanggrian@proton.me'
-TARGETS: list[dict[str, str]] = [
-    {'platform1': 'openjdk', 'version1': '8.0', 'platform2': 'python', 'version2': '3.12'},
-    {'platform1': 'openjdk', 'version1': '11.0', 'platform2': 'python', 'version2': '3.12'},
-    {'platform1': 'openjdk', 'version1': '17.0', 'platform2': 'python', 'version2': '3.12'},
-    {'platform1': 'openjdk', 'version1': '21.0', 'platform2': 'python', 'version2': '3.12'},
-    {'platform1': 'openjdk', 'version1': '8.0', 'platform2': 'python', 'version2': '3.13'},
-    {'platform1': 'openjdk', 'version1': '11.0', 'platform2': 'python', 'version2': '3.13'},
-    {'platform1': 'openjdk', 'version1': '17.0', 'platform2': 'python', 'version2': '3.13'},
-    {'platform1': 'openjdk', 'version1': '21.0', 'platform2': 'python', 'version2': '3.13'},
-    {'platform1': 'android', 'version1': '2024.11', 'platform2': 'python', 'version2': '3.12'},
-    {'platform1': 'android', 'version1': '2025.02', 'platform2': 'python', 'version2': '3.12'},
-    {'platform1': 'android', 'version1': '2024.11', 'platform2': 'python', 'version2': '3.13'},
-    {'platform1': 'android', 'version1': '2025.02', 'platform2': 'python', 'version2': '3.13'},
-]
+TARGETS = (
+    {
+        'platform': 'openjdk',
+        'versions': ['8.0', '11.0', '17.0', '21.0'],
+    },
+    {
+        'platform': 'android',
+        'versions': ['2024.11', '2025.02'],
+    },
+    {
+        'platform': 'python',
+        'versions': ['3.12', '3.13'],
+    },
+)
+
+# rebuild targets
+new_targets = []
+python = TARGETS[-1]
+for target in TARGETS[:-1]:
+    for python_version in python['versions']:
+        for target_version in target['versions']:
+            new_targets.append({
+                'platform1': target['platform'],
+                'version1': target_version,
+                'platform2': python['platform'],
+                'version2': python_version,
+            })
+TARGETS = tuple(new_targets)
 
 
 def get_content(
-    platform: str,
-    version: str,
+    cimg_platform: str,
+    cimg_version: str,
     dockerfile: str = 'Dockerfile',
 ):
     """Retrieve content from GitHub raw file."""
-    url: str = f'https://github.com/CircleCI-Public/cimg-{platform}/raw/main/{version}/{dockerfile}'
+    url: str = \
+        'https://github.com/CircleCI-Public/' + \
+        f'cimg-{cimg_platform}/raw/' + \
+        f'main/{cimg_version}/{dockerfile}'
     response: Response = get(url, timeout=6)
     response.raise_for_status()
     text: str = response.text.replace('\t', '  ')
@@ -38,29 +56,40 @@ def get_content(
 
 if __name__ == '__main__':
     build_images_lines: str = \
-        '''#!/usr/bin/env bash
+        dedent(
+            '''
+            #!/usr/bin/env bash
 
-set -eo pipefail
+            set -eo pipefail
 
-'''
+            ''',
+        ).lstrip()
     push_images_lines: str = \
-        '''#!/usr/bin/env bash
+        dedent(
+            '''
+            #!/usr/bin/env bash
 
-set -eo pipefail
+            set -eo pipefail
 
-'''
+            ''',
+        ).lstrip()
 
     for target in TARGETS:
         dockerfile_lines: str = \
-            f'''
-FROM cimg/base:{BASE_VERSION}
+            dedent(
+                f'''
+                FROM cimg/base:{BASE_VERSION}
 
-LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
-'''
+                LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
+                ''',
+            )
         dockerfile_comments: str = \
-            '''# A combination of:
-#
-'''
+            dedent(
+                '''
+                # A combination of:
+                #
+                ''',
+            ).lstrip()
 
         # standard images
         path, content = get_content(target['platform1'], target['version1'])
@@ -80,13 +109,15 @@ LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
         with open(f'{dir_name}/Dockerfile', 'w', encoding='UTF-8') as file:
             file.write(dockerfile_comments + dockerfile_lines)
 
-        dockerfile_node_lines: str = \
-            f'''
-FROM hanggrian/cimg-multiplatform:{dir_name}
-
-LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
-'''
         # node images are built on standard images
+        dockerfile_node_lines: str = \
+            dedent(
+                f'''
+                FROM hanggrian/cimg-multiplatform:{dir_name}
+
+                LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
+                ''',
+            )
         _, content = \
             get_content(
                 target['platform1'],
@@ -100,11 +131,13 @@ LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
 
         # browser images are built on standard images
         dockerfile_browsers_lines: str = \
-            f'''
-FROM hanggrian/cimg-multiplatform:{dir_name}-node
+            dedent(
+                f'''
+                FROM hanggrian/cimg-multiplatform:{dir_name}-node
 
-LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
-'''
+                LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
+                ''',
+            )
         _, content = \
             get_content(
                 target['platform1'],
@@ -117,22 +150,25 @@ LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
             file.write(dockerfile_comments + dockerfile_browsers_lines)
 
         # create shell scripts
+        # pylint: disable=line-too-long
         build_images_lines += \
-            f'docker build --file {dir_name}/Dockerfile' + \
-            f' -t hanggrian/cimg-multiplatform:{dir_name}' + \
-            ' --platform linux/amd64 .\n' + \
-            f'docker build --file {dir_name}/node/Dockerfile' + \
-            f' -t hanggrian/cimg-multiplatform:{dir_name}-node' + \
-            ' --platform linux/amd64 .\n' + \
-            f'docker build --file {dir_name}/browsers/Dockerfile' + \
-            f' -t hanggrian/cimg-multiplatform:{dir_name}-browsers' + \
-            ' --platform linux/amd64 .\n\n'
-        push_images_lines += \
-            f'''docker push hanggrian/cimg-multiplatform:{dir_name}
-docker push hanggrian/cimg-multiplatform:{dir_name}-node
-docker push hanggrian/cimg-multiplatform:{dir_name}-browsers
+            dedent(
+                f'''
+                docker build --file {dir_name}/Dockerfile -t hanggrian/cimg-multiplatform:{dir_name} --platform linux/amd64 .
+                docker build --file {dir_name}/node/Dockerfile -t hanggrian/cimg-multiplatform:{dir_name}-node --platform linux/amd64 .
+                docker build --file {dir_name}/browsers/Dockerfile -t hanggrian/cimg-multiplatform:{dir_name}-browsers --platform linux/amd64 .
 
-'''
+                ''',
+            ).lstrip()
+        push_images_lines += \
+            dedent(
+                f'''
+                docker push hanggrian/cimg-multiplatform:{dir_name}
+                docker push hanggrian/cimg-multiplatform:{dir_name}-node
+                docker push hanggrian/cimg-multiplatform:{dir_name}-browsers
+
+                ''',
+            ).lstrip()
 
     with open('build_images.sh', 'w', encoding='UTF-8') as file:
         file.write(build_images_lines)
