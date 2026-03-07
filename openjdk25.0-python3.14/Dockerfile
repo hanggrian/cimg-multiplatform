@@ -1,13 +1,13 @@
 # A combination of:
 #
-# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/21.0/Dockerfile
-# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.13/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/25.0/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.14/Dockerfile
 
 FROM cimg/base:2026.03
 
 LABEL maintainer="Hendra Anggrian <hanggrian@proton.me>"
 
-ENV JAVA_VERSION=21.0.9
+ENV JAVA_VERSION=25.0.1
 ENV JAVA_HOME=/usr/local/jdk-${JAVA_VERSION}
 
 RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
@@ -34,7 +34,7 @@ RUN [[ $(uname -m) == "x86_64" ]] && ARCH="x64" || ARCH="aarch64" && \
   sudo tar -xzf java.tar.gz --strip-components=1 -C /usr/local/jdk-${JAVA_VERSION} && \
   rm java.tar.gz && \
   if [[ "$JAVA_VERSION" == *"0.0"* ]]; then \
-    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-21; \
+    sudo ln -s /usr/local/jdk-${JAVA_VERSION} /usr/local/jdk-25; \
   fi && \
   sudo ln -s /usr/local/jdk-${JAVA_VERSION}/bin/* /usr/bin/ && \
   sudo mkdir -p /etc/ssl/certs/java/cacerts && \
@@ -55,7 +55,7 @@ RUN dl_URL="https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binar
   sudo ln -s /opt/apache-maven-* /opt/apache-maven && \
   mvn --version
 
-ENV GRADLE_VERSION=8.14.3 \
+ENV GRADLE_VERSION=9.2.0 \
   PATH=/opt/gradle/bin:$PATH
 RUN dl_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" && \
   curl -sSL --fail --retry 3 $dl_URL -o gradle.zip && \
@@ -79,8 +79,8 @@ RUN dl_URL="https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${S
 
 ENV PYENV_ROOT=/home/circleci/.pyenv \
   PATH=/home/circleci/.pyenv/shims:/home/circleci/.pyenv/bin:/home/circleci/.poetry/bin:$PATH \
-  PYTHON_VERSION=3.13.12 \
-  PIPENV_DEFAULT_PYTHON_VERSION=3.13.12
+  PYTHON_VERSION=3.14.3 \
+  PIPENV_DEFAULT_PYTHON_VERSION=3.14.3
 
 RUN sudo apt-get update && sudo apt-get install -y \
     build-essential \
@@ -109,7 +109,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
   curl -sSL "https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer" | bash && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.13.12 && pyenv global 3.13.12
+RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.14.3 && pyenv global 3.14.3
 
 RUN python --version && \
   pip --version && \

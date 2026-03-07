@@ -1,7 +1,7 @@
 # A combination of:
 #
 # - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/21.0/Dockerfile
-# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.13/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.14/Dockerfile
 
 FROM cimg/base:2026.03
 
@@ -79,8 +79,8 @@ RUN dl_URL="https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${S
 
 ENV PYENV_ROOT=/home/circleci/.pyenv \
   PATH=/home/circleci/.pyenv/shims:/home/circleci/.pyenv/bin:/home/circleci/.poetry/bin:$PATH \
-  PYTHON_VERSION=3.13.12 \
-  PIPENV_DEFAULT_PYTHON_VERSION=3.13.12
+  PYTHON_VERSION=3.14.3 \
+  PIPENV_DEFAULT_PYTHON_VERSION=3.14.3
 
 RUN sudo apt-get update && sudo apt-get install -y \
     build-essential \
@@ -109,7 +109,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
   curl -sSL "https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer" | bash && \
   sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.13.12 && pyenv global 3.13.12
+RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.14.3 && pyenv global 3.14.3
 
 RUN python --version && \
   pip --version && \

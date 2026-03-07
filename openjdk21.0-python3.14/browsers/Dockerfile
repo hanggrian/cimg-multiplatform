@@ -1,9 +1,9 @@
 # A combination of:
 #
 # - https://github.com/CircleCI-Public/cimg-openjdk/raw/main/21.0/Dockerfile
-# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.13/Dockerfile
+# - https://github.com/CircleCI-Public/cimg-python/raw/main/3.14/Dockerfile
 
-FROM hanggrian/cimg-multiplatform:openjdk21.0-python3.13-node
+FROM hanggrian/cimg-multiplatform:openjdk21.0-python3.14-node
 
 LABEL maintainer="Hendra Anggrian <hanggrian@proton.me>"
 

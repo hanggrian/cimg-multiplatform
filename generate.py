@@ -1,25 +1,31 @@
-# pylint: disable=missing-module-docstring
+# Manual cleaning after generate:
+#
+# - Replace all 'https://dlcdn.apache.org/maven/maven-3/' with
+#   'https://archive.apache.org/dist/maven/maven-3/'
+# - Replace all 'http://apache.osuosl.org/maven/maven-3/' with
+#   'https://archive.apache.org/dist/maven/maven-3/'
 
 from os import makedirs
 from textwrap import dedent
 
+from colorama import Fore, Style
 from requests import get, Response
 
-BASE_VERSION: str = '2024.02'
+BASE_VERSION: str = '2026.03'  # always latest
 MAINTAINER_NAME: str = 'Hendra Anggrian'
 MAINTAINER_EMAIL: str = 'hanggrian@proton.me'
 TARGETS = (
     {
         'platform': 'openjdk',
-        'versions': ['8.0', '11.0', '17.0', '21.0'],
+        'versions': ['17.0', '21.0', '25.0'],
     },
     {
         'platform': 'android',
-        'versions': ['2024.11', '2025.02'],
+        'versions': ['2024.04', '2025.03', '2026.03'],
     },
     {
         'platform': 'python',
-        'versions': ['3.12', '3.13'],
+        'versions': ['3.13', '3.14'],
     },
 )
 
@@ -74,7 +80,14 @@ if __name__ == '__main__':
             ''',
         ).lstrip()
 
+    print(f'{Fore.YELLOW}Merging cimgs...{Style.RESET_ALL}')
     for target in TARGETS:
+        platform1: str = target['platform1']
+        platform2: str = target['platform2']
+        version1: str = target['version1']
+        version2: str = target['version2']
+        print(f'- {platform1}-{version1} + {platform2}-{version2}')
+
         dockerfile_lines: str = \
             dedent(
                 f'''
@@ -92,19 +105,14 @@ if __name__ == '__main__':
             ).lstrip()
 
         # standard images
-        path, content = get_content(target['platform1'], target['version1'])
+        path, content = get_content(platform1, version1)
         dockerfile_lines += content
         dockerfile_comments += f'# - {path}\n'
-        path, content = get_content(target['platform2'], target['version2'])
+        path, content = get_content(platform2, version2)
         dockerfile_lines += content
         dockerfile_comments += f'# - {path}\n'
 
-        dir_name: str = \
-            target['platform1'] + \
-            target['version1'] + \
-            '-' + \
-            target['platform2'] + \
-            target['version2']
+        dir_name: str = platform1 + version1 + '-' + platform2 + version2
         makedirs(dir_name, exist_ok=True)
         with open(f'{dir_name}/Dockerfile', 'w', encoding='UTF-8') as file:
             file.write(dockerfile_comments + dockerfile_lines)
@@ -118,12 +126,7 @@ if __name__ == '__main__':
                 LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
                 ''',
             )
-        _, content = \
-            get_content(
-                target['platform1'],
-                target['version1'],
-                'node/Dockerfile',
-            )
+        _, content = get_content(platform2, version2, 'node/Dockerfile')
         dockerfile_node_lines += content
         makedirs(f'{dir_name}/node', exist_ok=True)
         with open(f'{dir_name}/node/Dockerfile', 'w', encoding='UTF-8') as file:
@@ -138,19 +141,13 @@ if __name__ == '__main__':
                 LABEL maintainer="{MAINTAINER_NAME} <{MAINTAINER_EMAIL}>"
                 ''',
             )
-        _, content = \
-            get_content(
-                target['platform1'],
-                target['version1'],
-                'browsers/Dockerfile',
-            )
+        _, content = get_content(platform2, version2, 'browsers/Dockerfile')
         dockerfile_browsers_lines += content
         makedirs(f'{dir_name}/browsers', exist_ok=True)
         with open(f'{dir_name}/browsers/Dockerfile', 'w', encoding='UTF-8') as file:
             file.write(dockerfile_comments + dockerfile_browsers_lines)
 
         # create shell scripts
-        # pylint: disable=line-too-long
         build_images_lines += \
             dedent(
                 f'''
@@ -170,8 +167,12 @@ if __name__ == '__main__':
                 ''',
             ).lstrip()
 
+    print(f'{Fore.YELLOW}Creating shell scripts...{Style.RESET_ALL}')
     with open('build_images.sh', 'w', encoding='UTF-8') as file:
         file.write(build_images_lines)
-
     with open('push_images.sh', 'w', encoding='UTF-8') as file:
         file.write(push_images_lines)
+
+    print(f'{Fore.GREEN}Done.{Style.RESET_ALL}')
+    print()
+    print('Goodbye!')

@@ -1,0 +1,22 @@
+[project]
+name = "cimg-multiplatform"
+version = "1"
+requires-python = ">=3.10"
+dependencies = [
+  "colorama",
+  "requests",
+]
+
+[dependency-groups]
+dev = [
+  # lint
+  "pylint==4.0.4",
+  "rulebook-pylint==0.2",
+  "regex",
+  # test
+  "pytest",
+  "pytest-cov",
+]
+
+[tool.coverage.run]
+omit = ["test_*"]

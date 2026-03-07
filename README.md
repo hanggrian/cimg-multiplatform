@@ -1,22 +1,22 @@
+[![CircleCI](https://img.shields.io/circleci/build/gh/hanggrian/cimg-multiplatform)](https://app.circleci.com/pipelines/gh/hanggrian/cimg-multiplatform/)
+[![Codecov](https://img.shields.io/codecov/c/gh/hanggrian/cimg-multiplatform)](https://app.codecov.io/gh/hanggrian/cimg-multiplatform/)
 [![Docker Hub](https://img.shields.io/docker/v/hanggrian/cimg-multiplatform)](https://hub.docker.com/r/hanggrian/cimg-multiplatform/)
 
 # CircleCI Multiplatform Images
 
 This repository combines the Dockerfiles from the official CircleCI convenient
-images with no customizations.
+images with no customizations. All images have `node` and `browsers` variants.
 
-Build matrix | Versions | Variants
---- |--- | ---
-Java | All LTS versions (8, 11, 17, 21) | Node, browsers
-Android | 2024 and 2025 | Node, browsers
-Python | 3.12 and 3.13 | Node, browsers
+- **OpenJDK:** [LTS versions](https://www.oracle.com/java/technologies/java-se-support-roadmap.html) with premier support
+- **Android:** [Supported versions](https://en.wikipedia.org/wiki/Android_version_history)
+- **Python:** [Versions](https://devguide.python.org/versions/) in bugfix window
 
 ## Building
 
 Generate Docker files and shell scripts with `generate.py`.
 
 ```sh
-python generate.py
+uv run generate.py
 sudo ./build_images.sh
 sudo ./push_images.sh
 ```
