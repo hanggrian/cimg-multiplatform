@@ -4,38 +4,43 @@ orbs:
   codecov: codecov/codecov@5.4.3
 
 executors:
-  base:
-    docker:
-      - image: cimg/base:current
   python:
     docker:
       - image: cimg/python:3.14
+  renovate:
+    docker:
+      - image: renovate/renovate:latest
 
 jobs:
   setup-workspace:
-    executor: base
+    executor: python
     steps:
       - checkout
+      - run: uv sync
       - persist_to_workspace:
           root: .
-          paths: [.]
+          paths:
+            - .
+            - .venv
   run-lint:
     executor: python
     steps:
       - attach_workspace:
           at: .
-      - run: uv sync
       - run: uv run pylint *.py
   upload-coverage:
     executor: python
     steps:
       - attach_workspace:
           at: .
-      - run: uv sync
       - run: |
           uv run pytest test_generate.py --cov
           uv run coverage xml
       - codecov/upload
+  activate-renovatebot:
+    executor: renovate
+    steps:
+      - run: renovate
 
 workflows:
   code-analysis:
@@ -45,3 +50,4 @@ workflows:
           requires: [setup-workspace]
       - upload-coverage:
           requires: [setup-workspace]
+      - activate-renovatebot
