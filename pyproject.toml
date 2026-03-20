@@ -10,7 +10,7 @@ dependencies = [
 [dependency-groups]
 dev = [
   # lint
-  "pylint==4.0.4",
+  "pylint==4.0.5",
   "rulebook-pylint==0.2",
   "regex",
   # test
