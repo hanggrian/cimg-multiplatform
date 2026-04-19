@@ -3,7 +3,7 @@
 # - https://github.com/CircleCI-Public/cimg-android/raw/main/2025.03/Dockerfile
 # - https://github.com/CircleCI-Public/cimg-python/raw/main/3.13/Dockerfile
 
-FROM cimg/base:2026.03
+FROM cimg/base:2026.04
 
 LABEL maintainer="Hendra Anggrian <hanggrian@proton.me>"
 
